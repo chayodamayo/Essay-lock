@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EssayLock</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#161a2b;--mu:#6a7190;--ac:#4f46e5;--ac2:#eef0ff;--bd:#e3e6f0;--ok:#16a34a;--bad:#dc2626;--warn:#d97706;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1020;--card:#171a2f;--tx:#eceefb;--mu:#8f95b8;--ac:#818cf8;--ac2:#232850;--bd:#272b4a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1020;--card:#171a2f;--tx:#eceefb;--mu:#8f95b8;--ac:#818cf8;--ac2:#232850;--bd:#272b4a;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;box-shadow:0 2px 12px rgba(20,20,60,.05)}
+h1,h2,h3{margin:0 0 8px}h2{font-size:20px}h3{font-size:16px}.mu{color:var(--mu)}.sm{font-size:13px}
+input,textarea,select{width:100%;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
+label{display:block;font-size:13px;color:var(--mu);margin:12px 0 5px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 16px;background:var(--ac);color:#fff;font-weight:600}
+button.g{background:var(--ac2);color:var(--ac)}button.d{background:transparent;color:var(--bad);border:1px solid var(--bd);padding:6px 12px}
+button:disabled{opacity:.5;cursor:not-allowed}
+#auth{min-height:100vh;display:grid;place-items:center;padding:16px}#auth .card{width:100%;max-width:400px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;margin-bottom:6px}
+.logo i{width:34px;height:34px;border-radius:11px;background:var(--ac);display:grid;place-items:center;color:#fff;font-style:normal}
+.seg{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:6px}
+.seg button{flex:1;background:transparent;color:var(--mu);padding:8px}.seg button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+#app{display:none;min-height:100vh}
+.side{width:230px;padding:18px;border-right:1px solid var(--bd);background:var(--card);display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.tab{display:flex;gap:10px;align-items:center;background:transparent;color:var(--mu);text-align:left;padding:11px 14px;font-weight:600}
+.tab.on{background:var(--ac2);color:var(--ac)}
+.main{flex:1;padding:24px;max-width:1000px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px;flex-wrap:wrap}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--ac2);color:var(--ac)}
+.pill.ok{background:rgba(22,163,74,.15);color:var(--ok)}.pill.bad{background:rgba(220,38,38,.15);color:var(--bad)}.pill.warn{background:rgba(217,119,6,.15);color:var(--warn)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat b{display:block;font-size:26px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}th{color:var(--mu);font-size:12px;text-transform:uppercase}
+#essay{min-height:340px;resize:vertical;font:17px/1.7 Georgia,serif}
+.sw{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd);gap:12px}
+.sw input{width:20px;height:20px}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:8px}
+@media(max-width:720px){#app{display:none}.side{width:100%;height:auto;flex-direction:row;overflow-x:auto;position:sticky;top:0;z-index:5;border-right:0;border-bottom:1px solid var(--bd);padding:10px}.tab{white-space:nowrap;padding:9px 12px}.main{padding:14px}.hide-m{display:none}}
+body.pend .tab,body.pend .hide-m:not(#out){display:none!important}
+body.in #app{display:flex}body.in #auth{display:none}
+@media(max-width:720px){body.in #app{flex-direction:column}}
+body{background:radial-gradient(800px 420px at 8% -8%,var(--ac2),transparent 70%),radial-gradient(700px 400px at 100% 110%,var(--ac2),transparent 70%),var(--bg);background-attachment:fixed}
+.card{transition:box-shadow .3s,transform .3s}.card:hover{box-shadow:0 10px 34px -14px var(--ac)}
+#view>*{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}#view>*:nth-child(2){animation-delay:.06s}#view>*:nth-child(3){animation-delay:.12s}#view>*:nth-child(4){animation-delay:.18s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}50%{box-shadow:0 0 0 6px rgba(22,163,74,0)}}@keyframes pop{from{opacity:0;transform:scale(.96)}}
+button{transition:box-shadow .2s,transform .15s,background .2s}button:not(.g):not(.d):not(.tab):hover{box-shadow:0 0 22px -3px var(--ac);transform:translateY(-1px)}button:active{transform:scale(.97)}
+.tab:hover{background:var(--ac2)}.tab.on{box-shadow:inset 3px 0 0 var(--ac),0 0 20px -8px var(--ac)}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.logo i{box-shadow:0 0 22px -2px var(--ac)}.logo .ic{stroke:#fff}
+.pill.ok{animation:pulse 2.2s infinite}
+#auth .card{animation:pop .5s both;box-shadow:0 0 60px -20px var(--ac)}
+table tr:hover td{background:var(--ac2)}td,th{transition:background .2s}
+.modal{position:fixed;inset:0;background:rgba(5,6,20,.6);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));z-index:50;animation:pop .25s both}
+.box{width:100%;max-width:760px;max-height:92vh;overflow:auto}
+.rp{white-space:pre-wrap;min-height:220px;max-height:46vh;overflow:auto;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px;font:16px/1.7 Georgia,serif}
+</style></head><body>
+<div id="auth"><div class="card">
+<div class="logo"><i>✎</i>EssayLock</div><p class="mu sm" style="margin-top:0">Secure essay writing for class.</p>
+<div class="seg"><button id="mIn" class="on">Log in</button><button id="mUp">Sign up</button></div>
+<label>Username</label><input id="u" autocomplete="username">
+<label>Password</label><input id="p" type="password" autocomplete="current-password">
+<div id="roleBox" style="display:none"><label>I am a…</label><select id="role"><option value="student">Student</option><option value="teacher">Teacher</option></select><div id="clsBox"><label>Class code</label><input id="cls" autocomplete="off" placeholder="From your teacher" style="text-transform:uppercase"></div><div id="codeBox" style="display:none"><label>Teacher access code</label><input id="code" type="password"></div></div>
+<div class="err" id="err"></div>
+<button id="go" style="width:100%;margin-top:6px">Log in</button>
+<p class="mu sm" style="margin:14px 0 0">Demo mode: accounts are stored on this device only.</p>
+</div></div>
+
+<div id="app">
+<nav class="side"><div class="logo"><i>✎</i>EssayLock</div>
+<button class="tab on" data-t="essay">Essay</button>
+<button class="tab" data-t="users" id="tUsers">Class</button>
+<button class="tab" data-t="activity">Activity</button>
+<button class="tab" data-t="settings">Settings</button>
+<div style="flex:1" class="hide-m"></div>
+<div class="sm mu hide-m" id="who" style="padding:8px 14px"></div>
+<button class="g hide-m" id="out">Log out</button></nav>
+<main class="main" id="view"></main></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const TEACHER_HASH='6e6a370800dad00ea9163fac5bfeeed428d1c058ea38aeae3e7e322c5ef90021';
+const DEF={blockPaste:true,logTabOut:true,theme:'auto'};
+let users=ld('el_users',[]),events=ld('el_events',[]),cfg=Object.assign({},DEF,ld('el_cfg',{})),me=null,tab='essay',active=false,mode='in';
+async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('el:'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa(s)}}
+async function hash2(p,s){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(s),iterations:150000,hash:'SHA-256'},k,256);return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const genCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c;do{c=Array.from(crypto.getRandomValues(new Uint8Array(6)),b=>A[b%A.length]).join('')}while(users.some(u=>u.classCode===c));return c};
+const gateOpen=u=>{const T=users.find(x=>x.name===u.cls);return !!(u.approved||(T&&T.classActive))};
+async function mk(p){const s=[...crypto.getRandomValues(new Uint8Array(16))].map(x=>x.toString(16).padStart(2,'0')).join('');return{salt:s,hash:await hash2(p,s)}}
+let idle=Date.now();['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>idle=Date.now()));setInterval(()=>{if(me&&!active&&Date.now()-idle>9e5)$('#out').click()},30000);
+const fmt=t=>new Date(t).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function applyTheme(){const r=document.documentElement;cfg.theme==='auto'?r.removeAttribute('data-theme'):r.setAttribute('data-theme',cfg.theme)}
+function log(type,detail){if(!me)return;events.push({t:Date.now(),u:me.name,type,detail:detail||''});if(events.length>1000)events=events.slice(-1000);sv('el_events',events)}
+applyTheme();
+
+// auth
+const IC={pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.3c2.2.7 3.5 2.6 3.5 5.7"/>',list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'};
+const ic=n=>'<svg class="ic" viewBox="0 0 24 24">'+IC[n]+'</svg>';
+document.querySelectorAll('.tab').forEach(b=>b.insertAdjacentHTML('afterbegin',ic({essay:'pen',users:'users',activity:'list',settings:'gear'}[b.dataset.t])));
+document.querySelectorAll('.logo i').forEach(i=>i.innerHTML=ic('pen'));
+function diff(a,b){let i=0;while(i<a.length&&i<b.length&&a[i]===b[i])i++;let j=0;while(j<a.length-i&&j<b.length-i&&a[a.length-1-j]===b[b.length-1-j])j++;return[i,a.length-i-j,b.slice(i,b.length-j)]}
+let RP=null;
+function rec(a,b){if(!active||!RP)return;const d=diff(a,b);RP.o.push([Date.now()-RP.s,d[0],d[1],d[2]])}
+setInterval(()=>{if(RP&&me)sv('el_rp_'+me.name,RP)},3000);
+function replay(name){
+ const R=ld('el_rp_'+name,null),m=document.createElement('div');m.className='modal';document.body.append(m);let tm=null;
+ const close=()=>{clearTimeout(tm);m.remove()};
+ if(!R||!R.o.length){m.innerHTML='<div class=\'card box\'><h3>'+esc(name)+'</h3><p class=\'mu\'>No typing recorded yet.</p><button class=\'g\' id=\'x\'>Close</button></div>';m.querySelector('#x').onclick=close;return}
+ const ops=R.o,q=s=>m.querySelector(s);let txt='',i=0,run=false;
+ const mx=Math.max(...ops.map(o=>o[3].length)),dl=ops.filter(o=>o[2]>0).length;
+ m.innerHTML=`<div class='card box'><div class='top'><h3>${esc(name)}’s typing replay</h3><button class='d' id='x'>Close</button></div><div class='rp' id='rpo'></div><div class='row' style='margin-top:12px'><button id='pl'>Play</button><button class='g' id='rs'>Restart</button><select id='sp' style='width:auto'><option value='1'>1×</option><option value='4' selected>4×</option><option value='16'>16×</option></select><input id='bar' type='range' min='0' max='${ops.length}' value='0' style='flex:1;min-width:120px'></div><div class='mu sm' id='inf' style='margin-top:8px'></div></div>`;
+ const ap=o=>{txt=txt.slice(0,o[1])+o[3]+txt.slice(o[1]+o[2])};
+ const show=()=>{q('#rpo').textContent=txt;q('#bar').value=i;q('#inf').textContent=`Edit ${i} of ${ops.length} · deletions/rewrites: ${dl} · longest single insert: ${mx} characters`};
+ const seek=n=>{txt='';i=0;while(i<n)ap(ops[i++]);show()};
+ const step=()=>{if(!run)return;if(i>=ops.length){run=false;q('#pl').textContent='Play';return}ap(ops[i]);i++;show();const gap=i<ops.length?Math.min(ops[i][0]-ops[i-1][0],2000):0;tm=setTimeout(step,gap/(+q('#sp').value))};
+ q('#pl').onclick=()=>{run=!run;q('#pl').textContent=run?'Pause':'Play';if(run){if(i>=ops.length)seek(0);step()}else clearTimeout(tm)};
+ q('#rs').onclick=()=>{clearTimeout(tm);run=false;q('#pl').textContent='Play';seek(0)};
+ q('#bar').oninput=e=>{clearTimeout(tm);run=false;q('#pl').textContent='Play';seek(+e.target.value)};
+ q('#x').onclick=close;m.onclick=e=>{if(e.target===m)close()};show();
+}
+$('#mIn').onclick=()=>setMode('in');$('#mUp').onclick=()=>setMode('up');
+function setMode(m){mode=m;$('#mIn').classList.toggle('on',m==='in');$('#mUp').classList.toggle('on',m==='up');$('#roleBox').style.display=m==='up'?'block':'none';$('#go').textContent=m==='in'?'Log in':'Create account';$('#err').textContent=''}
+$('#role').onchange=()=>{const t=$('#role').value==='teacher';$('#codeBox').style.display=t?'block':'none';$('#clsBox').style.display=t?'none':'block'};
+$('#go').onclick=submit;$('#p').onkeydown=e=>{if(e.key==='Enter')submit()};
+async function submit(){
+ const n=$('#u').value.trim(),p=$('#p').value,E=$('#err');
+ if(n.length<3||p.length<4){E.textContent='Username 3+ characters, password 4+ characters.';return}
+ const h=await hash(p),ex=users.find(x=>x.name.toLowerCase()===n.toLowerCase());
+ if(mode==='up'){
+  if(ex){E.textContent='That username is taken.';return}
+  const r=$('#role').value;
+  if(r==='teacher'&&await hash($('#code').value)!==TEACHER_HASH){E.textContent='Wrong teacher access code.';return}
+  let extra={};
+  if(r==='teacher')extra={classCode:genCode(),classActive:false};
+  else{const cc=$('#cls').value.trim().toUpperCase(),T=users.find(x=>x.role==='teacher'&&x.classCode===cc);if(!cc||!T){E.textContent='That class code doesn’t exist. Ask your teacher.';return}extra={cls:T.name}}
+  users.push({name:n,...await mk(p),role:r,approved:r==='teacher',...extra,joined:Date.now(),last:Date.now()});sv('el_users',users);enter(users[users.length-1]);
+ }else{
+  const L=ld('el_fail',{}),k=n.toLowerCase(),f=L[k]||{c:0,t:0};
+  if(Date.now()<f.t){E.textContent='Too many tries. Wait '+Math.ceil((f.t-Date.now())/1000)+'s.';return}
+  const ok=ex&&(ex.salt?await hash2(p,ex.salt)===ex.hash:ex.hash===h);
+  if(!ok){f.c++;if(f.c>=5)f.t=Date.now()+30000*Math.pow(2,Math.min(f.c-5,4));L[k]=f;sv('el_fail',L);E.textContent='Wrong username or password.';return}
+  delete L[k];sv('el_fail',L);if(!ex.salt)Object.assign(ex,await mk(p));
+  ex.last=Date.now();sv('el_users',users);enter(ex);
+ }
+}
+function enter(u){me=u;if(u.role==='teacher'&&!u.classCode){u.classCode=genCode();u.classActive=false;sv('el_users',users)}try{sessionStorage.setItem('el_me',u.name)}catch(e){}document.body.classList.add('in');$('#p').value='';
+ $('#tUsers').style.display=u.role==='teacher'?'':'none';document.querySelector('[data-t="activity"]').style.display=u.role==='teacher'?'':'none';$('#who').innerHTML=esc(u.name)+' <span class="pill">'+u.role+'</span>';log('login');tab='essay';render()}
+$('#out').onclick=()=>{if(active)stopEssay();log('logout');me=null;try{sessionStorage.removeItem('el_me')}catch(e){}document.body.classList.remove('in')};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{if(active&&b.dataset.t!=='essay'){}tab=b.dataset.t;render()});
+
+function render(){
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+ const v=$('#view'),pend=me.role==='student'&&!gateOpen(me);document.body.classList.toggle('pend',pend);if(pend){vPending(v);return}({essay:vEssay,users:vUsers,activity:vActivity,settings:vSettings}[tab])(v)}
+
+// essay
+function vPending(v){v.innerHTML=`<div class="card" style="max-width:480px;margin:10vh auto;text-align:center"><h2>Waiting for your teacher</h2><p class="mu">You’re in the class. Your teacher needs to activate it before you can start working.</p><span class="pill warn">Pending approval</span><div style="margin-top:16px"><button class="g" id="chk">Check again</button> <button class="g" id="lo">Log out</button></div></div>`;$('#chk').onclick=recheck;$('#lo').onclick=()=>$('#out').click()}
+function recheck(){if(!me)return;users=ld('el_users',users);const u=users.find(x=>x.name===me.name);if(!u){$('#out').click();return}me=u;if(me.role==='student'){const was=document.body.classList.contains('pend'),now=!gateOpen(me);if(was!==now){if(now&&active)stopEssay();render()}}}
+setInterval(()=>{if(me&&me.role==='student')recheck()},3000);
+function essayKey(){return 'el_essay_'+me.name}
+function vEssay(v){
+ const d=ld(essayKey(),{title:'',body:''});
+ v.innerHTML=`<div class="top"><div><h2>Essay</h2><span class="mu sm">Your work saves automatically.</span></div><div class="row"><span id="st" class="pill ${active?'ok':''}">${active?'Session active':'Not started'}</span><span id="wc" class="pill"></span></div></div>
+ <div class="card"><input id="ti" spellcheck="false" autocomplete="off" placeholder="Essay title" value="${esc(d.title)}" style="font-weight:700;font-size:17px;margin-bottom:12px">
+ <textarea id="essay" placeholder="Start writing here…" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" data-gramm="false" data-enable-grammarly="false">${esc(d.body)}</textarea>
+ <div class="row" style="margin-top:14px"><button id="start">${active?'Finish essay':'Start essay (fullscreen)'}</button><button id="fsb" class="g" style="display:none">Return to fullscreen</button><span class="mu sm">${cfg.blockPaste?'Pasting is disabled. ':''}Leaving fullscreen or switching tabs is logged.</span></div></div>`;
+ const ta=$('#essay'),ti=$('#ti');
+ const wc=()=>{const n=(ta.value.trim().match(/\S+/g)||[]).length;$('#wc').textContent=n+' words'};wc();
+ const save=()=>{sv(essayKey(),{title:ti.value,body:ta.value});wc()};
+ let prev=ta.value;ta.oninput=()=>{const g=ta.value.length-prev.length;if(g>12){ta.value=prev;log('Large insert blocked',g+' chars at once');return}rec(prev,ta.value);prev=ta.value;save()};ti.oninput=save;
+ const stop=(e,t,d)=>{e.preventDefault();log(t,d)};ta.onpaste=e=>stop(e,'Paste blocked',(e.clipboardData.getData('text')||'').length+' characters');ta.oncopy=e=>stop(e,'Copy blocked');ta.oncut=e=>stop(e,'Cut blocked');ta.oncontextmenu=e=>e.preventDefault();ta.ondragstart=e=>e.preventDefault();ta.onbeforeinput=e=>{if(/Paste|Drop|Replacement|Yank|Transpose/.test(e.inputType||'')){e.preventDefault();log('Blocked input',e.inputType)}};ta.onkeydown=e=>{if(((e.ctrlKey||e.metaKey)&&/^[cvxa]$/i.test(e.key))||(e.shiftKey&&e.key==='Insert')){e.preventDefault();log('Shortcut blocked',e.key)}};
+ ta.ondrop=e=>stop(e,'Drop blocked');
+ $('#start').onclick=()=>active?stopEssay():startEssay();
+ $('#fsb').onclick=()=>document.documentElement.requestFullscreen().catch(()=>{});
+ syncLock();
+}
+async function startEssay(){
+ try{await document.documentElement.requestFullscreen()}catch(e){}
+ try{await navigator.keyboard.lock(['Escape','Tab','MetaLeft','MetaRight','AltLeft','AltRight'])}catch(e){}
+ RP=ld('el_rp_'+me.name,{s:Date.now(),o:[]});active=true;log('Essay started');render()}
+function stopEssay(){active=false;if(RP&&me)sv('el_rp_'+me.name,RP);log('Essay finished');if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});if(me&&tab==='essay')render()}
+function syncLock(){const ta=$('#essay'),ti=$('#ti'),s=$('#st'),b=$('#fsb');if(!ta)return;const locked=active&&(!document.fullscreenElement||!document.hasFocus()||tooSmall()||Date.now()<dupUntil);ta.disabled=locked;ti.disabled=locked;if(b)b.style.display=locked?'inline-block':'none';if(s){s.className='pill '+(locked?'warn':active?'ok':'');s.textContent=locked?'Locked: return to the exam window':active?'Session active':'Not started'}}
+document.addEventListener('fullscreenchange',()=>{if(active&&!document.fullscreenElement&&cfg.logTabOut)log('Exited fullscreen');syncLock()});
+window.addEventListener('blur',()=>{if(active&&cfg.logTabOut)log('Left window or tab');setTimeout(syncLock,50)});
+window.addEventListener('focus',()=>{if(active&&cfg.logTabOut)log('Returned to window');syncLock()});
+var dupUntil=0,lastDup=0;const TID=Math.random().toString(36).slice(2);
+function tooSmall(){return innerWidth<screen.width*0.95||innerHeight<screen.height*0.9}
+window.addEventListener('resize',()=>{if(active&&document.fullscreenElement&&tooSmall())log('Window resized (split screen or devtools?)');syncLock()});
+setInterval(()=>{if(me)sv('el_live',{u:me.name,id:TID,t:Date.now()})},2000);
+window.addEventListener('storage',e=>{if(e.key!=='el_live'||!active||!me)return;let v=null;try{v=JSON.parse(e.newValue)}catch(x){}if(v&&v.u===me.name&&v.id!==TID){dupUntil=Date.now()+6000;setTimeout(syncLock,6100);syncLock();if(Date.now()-lastDup>10000){lastDup=Date.now();log('Essay open in another tab (blocked)')}}});
+
+// users
+function stats(n){const e=ld('el_essay_'+n,{body:''}),w=(e.body.trim().match(/\S+/g)||[]).length,o=events.filter(x=>x.u===n&&/Exited|Left window|blocked|another tab|resized/i.test(x.type)).length;return{w,o}}
+function vUsers(v){
+ if(me.role!=='teacher'){v.innerHTML='<div class="card"><h3>Teachers only</h3><p class="mu">You don’t have access to this tab.</p></div>';return}
+ const st=users.filter(u=>u.role==='student'&&(u.cls===me.name||!u.cls));
+ v.innerHTML=`<div class="top"><h2>Class</h2></div>
+ <div class="card" style="margin-bottom:16px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><span class="mu sm">Your class code</span><div style="font-size:30px;font-weight:800;letter-spacing:.18em;color:var(--ac);text-shadow:0 0 18px var(--ac2)">${me.classCode}</div><span class="mu sm">Give this to your students when they sign up.</span></div><div style="text-align:right"><span class="pill ${me.classActive?'ok':''}">${me.classActive?'Class active':'Class not active'}</span><div style="margin-top:10px"><button id="act" ${me.classActive?'class="d"':''}>${me.classActive?'Deactivate class':'Activate class'}</button></div></div></div>
+ <div class="grid"><div class="card stat"><span class="mu sm">Students</span><b>${st.length}</b></div><div class="card stat"><span class="mu sm">Class</span><b>${me.classActive?'Active':'Off'}</b></div><div class="card stat"><span class="mu sm">Flags logged</span><b>${events.filter(x=>/Exited|Left window|blocked|another tab|resized/i.test(x.type)).length}</b></div></div>
+ <div class="card tw"><table><tr><th>User</th><th>Role</th><th>Access</th><th>Words</th><th>Flags</th><th>Last login</th><th></th></tr>
+ ${users.filter(u=>u.name===me.name||u.cls===me.name||(u.role==='student'&&!u.cls)).map(u=>{const s=stats(u.name);return `<tr><td><b>${esc(u.name)}</b></td><td><span class="pill">${u.role}</span></td><td>${u.role==='teacher'?'<span class="pill ok">Teacher</span>':u.approved?`<button class="g" data-rev="${esc(u.name)}">Allowed anytime</button>`:`<button data-ok="${esc(u.name)}">Allow anytime</button>`}</td><td>${s.w}</td><td><span class="pill ${s.o?'bad':'ok'}">${s.o}</span></td><td class="mu">${fmt(u.last)}</td><td><button class="g" data-rp="${esc(u.name)}">Replay</button> ${u.name===me.name?'<span class="mu sm">You</span>':`<button class="d" data-del="${esc(u.name)}">Remove</button>`}</td></tr>`}).join('')}</table></div>
+ <div class="card" style="margin-top:16px"><h3>Add a student</h3><div class="row"><input id="nu" placeholder="Username" style="flex:1;min-width:140px"><input id="np" placeholder="Password" style="flex:1;min-width:140px"><button id="add">Add</button></div><div class="err" id="ne"></div></div>`;
+ const ac=$('#act');if(ac)ac.onclick=()=>{me.classActive=!me.classActive;sv('el_users',users);log(me.classActive?'Class activated':'Class deactivated');render()};
+ const al=$('#all');if(al)al.onclick=()=>{users.forEach(u=>{if(u.role==='student')u.approved=true});sv('el_users',users);render()};
+ v.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>replay(b.dataset.rp));
+ v.querySelectorAll('[data-ok],[data-rev]').forEach(b=>b.onclick=()=>{const u=users.find(x=>x.name===(b.dataset.ok||b.dataset.rev));if(u){u.approved=!!b.dataset.ok;sv('el_users',users);render()}});
+ v.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.dataset.del+'?')){users=users.filter(u=>u.name!==b.dataset.del);sv('el_users',users);render()}});
+ $('#add').onclick=async()=>{const n=$('#nu').value.trim(),p=$('#np').value;if(n.length<3||p.length<4){$('#ne').textContent='Username 3+, password 4+ characters.';return}
+  if(users.some(u=>u.name.toLowerCase()===n.toLowerCase())){$('#ne').textContent='Username taken.';return}
+  users.push({name:n,...await mk(p),role:'student',approved:false,cls:me.name,joined:Date.now(),last:0});sv('el_users',users);render()};
+}
+
+// activity
+function vActivity(v){
+ if(me.role!=='teacher'){v.innerHTML='<div class="card"><h3>Teachers only</h3><p class="mu">You don’t have access to this tab.</p></div>';return}
+ const t=true,list=events.slice().reverse().slice(0,200);
+ v.innerHTML=`<div class="top"><h2>Activity</h2>${t?'<button class="d" id="clr">Clear log</button>':''}</div>
+ <div class="card tw">${list.length?`<table><tr><th>Time</th>${t?'<th>User</th>':''}<th>Event</th><th>Details</th></tr>${list.map(e=>`<tr><td class="mu">${fmt(e.t)}</td>${t?`<td>${esc(e.u)}</td>`:''}<td><span class="pill ${/Exited|Left window|blocked|another tab|resized/i.test(e.type)?'bad':/Paste/.test(e.type)?'warn':''}">${esc(e.type)}</span></td><td class="mu">${esc(e.detail)}</td></tr>`).join('')}</table>`:'<p class="mu">Nothing logged yet.</p>'}</div>`;
+ const c=$('#clr');if(c)c.onclick=()=>{if(confirm('Clear all activity?')){events=[];sv('el_events',events);render()}};
+}
+
+// settings
+function vSettings(v){
+ const t=me.role==='teacher';
+ v.innerHTML=`<div class="top"><h2>Settings</h2></div>
+ <div class="card"><h3>Appearance</h3><label>Theme</label><select id="th"><option value="auto">Match device</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+ <div class="card" style="margin-top:16px"><h3>Essay rules ${t?'':'<span class="pill">Set by teacher</span>'}</h3>
+ <div class="sw"><div>Block pasting<div class="mu sm">Stops text being pasted in during a session.</div></div><input type="checkbox" id="bp" ${cfg.blockPaste?'checked':''} ${t?'':'disabled'}></div>
+ <div class="sw" style="border:0"><div>Log tab-outs<div class="mu sm">Record when a student leaves fullscreen or the tab.</div></div><input type="checkbox" id="lt" ${cfg.logTabOut?'checked':''} ${t?'':'disabled'}></div></div>
+ <div class="card" style="margin-top:16px"><h3>Change password</h3><label>New password</label><input id="np" type="password"><div class="err" id="pe"></div><button id="cp">Update password</button></div>`;
+ $('#th').value=cfg.theme;$('#th').onchange=e=>{cfg.theme=e.target.value;sv('el_cfg',cfg);applyTheme()};
+ if(t){$('#bp').onchange=e=>{cfg.blockPaste=e.target.checked;sv('el_cfg',cfg)};$('#lt').onchange=e=>{cfg.logTabOut=e.target.checked;sv('el_cfg',cfg)}}
+ $('#cp').onclick=async()=>{const p=$('#np').value;if(p.length<4){$('#pe').textContent='4+ characters.';return}Object.assign(me,await mk(p));sv('el_users',users);$('#np').value='';$('#pe').style.color='var(--ok)';$('#pe').textContent='Password updated.'};
+}
+
+// restore session
+try{const n=sessionStorage.getItem('el_me'),u=users.find(x=>x.name===n);if(u)enter(u)}catch(e){}
+</script></body></html>
